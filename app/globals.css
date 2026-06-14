@@ -1,0 +1,143 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #f8fafc;
+  --bg-elevated: #ffffff;
+  --grid-line: rgba(15, 23, 42, 0.05);
+}
+
+.dark {
+  --bg: #080d18;
+  --bg-elevated: #0e1726;
+  --grid-line: rgba(148, 163, 184, 0.06);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 6rem;
+  }
+
+  body {
+    @apply bg-night-50 text-night-900 antialiased dark:bg-night-950 dark:text-night-100;
+    background-image: radial-gradient(var(--grid-line) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  ::selection {
+    @apply bg-solar-400/30;
+  }
+}
+
+@layer components {
+  /* A reusable frosted-glass card surface */
+  .glass {
+    @apply rounded-2xl border border-night-200/70 bg-white/70 shadow-sm backdrop-blur-md dark:border-white/10 dark:bg-white/[0.03];
+  }
+
+  .container-page {
+    @apply mx-auto w-full max-w-7xl px-5 sm:px-8;
+  }
+
+  /* Animated solar gradient text */
+  .text-solar-gradient {
+    @apply bg-gradient-to-r from-solar-400 via-solar-500 to-rose-500 bg-clip-text text-transparent;
+  }
+}
+
+/* Slim, themed scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply rounded-full bg-night-300/60 dark:bg-night-700/70;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-solar-400/70;
+}
+
+/* ----------------------------------------------------------------------
+   Article typography (react-markdown + @tailwindcss/typography overrides)
+---------------------------------------------------------------------- */
+.article-prose {
+  @apply prose prose-lg max-w-none dark:prose-invert
+         prose-headings:font-display prose-headings:scroll-mt-28 prose-headings:font-semibold
+         prose-h2:mt-14 prose-h2:mb-5 prose-h2:text-2xl prose-h2:tracking-tight
+         prose-h3:mt-9 prose-h3:mb-3 prose-h3:text-xl
+         prose-p:leading-relaxed prose-p:text-night-700 dark:prose-p:text-night-200
+         prose-li:text-night-700 dark:prose-li:text-night-200
+         prose-strong:text-night-900 dark:prose-strong:text-white
+         prose-a:text-solar-600 prose-a:no-underline hover:prose-a:underline dark:prose-a:text-solar-300;
+}
+
+/* H2 gets a glowing solar accent bar */
+.article-prose h2 {
+  position: relative;
+  padding-left: 1rem;
+}
+.article-prose h2::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.15em;
+  bottom: 0.15em;
+  width: 4px;
+  border-radius: 9999px;
+  background: linear-gradient(180deg, #ffa31f, #f43f5e);
+}
+
+/* Blockquote "Key insight" callouts */
+.article-prose blockquote {
+  @apply not-italic rounded-r-xl border-0 border-l-4 border-solar-400 bg-solar-50 py-1 pl-5 pr-4 font-normal text-night-800
+         dark:bg-solar-500/10 dark:text-night-100;
+}
+.article-prose blockquote p {
+  @apply text-night-800 dark:text-night-100;
+}
+.article-prose blockquote p:first-of-type::before,
+.article-prose blockquote p:first-of-type::after {
+  content: "";
+}
+
+/* Inline code + code blocks */
+.article-prose :not(pre) > code {
+  @apply rounded-md bg-night-100 px-1.5 py-0.5 text-[0.85em] font-medium text-solar-700 before:content-[''] after:content-[''] dark:bg-night-800 dark:text-solar-200;
+}
+.article-prose pre {
+  @apply overflow-x-auto rounded-xl border border-night-200 bg-night-900 text-night-50 dark:border-white/10 dark:bg-black/40;
+}
+
+/* GFM tables */
+.article-prose table {
+  @apply block w-full overflow-x-auto text-sm md:table;
+}
+.article-prose thead {
+  @apply border-b-2 border-solar-300/60 dark:border-solar-500/30;
+}
+.article-prose th {
+  @apply bg-night-100/60 text-left font-semibold text-night-900 dark:bg-white/5 dark:text-white;
+}
+.article-prose tbody tr {
+  @apply border-b border-night-200/70 dark:border-white/5;
+}
+.article-prose td,
+.article-prose th {
+  @apply px-3 py-2 align-top;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}
