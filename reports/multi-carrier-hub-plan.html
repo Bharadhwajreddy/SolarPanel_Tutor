@@ -1,0 +1,571 @@
+<title>Multi-Carrier Hub Plan</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column (~760px) of numbered sections; charts sit full column width in plain framed panels; shipping-label styling marks process steps. */
+:root{
+  --bg:#f6f6f3; --surface:#fcfcfb; --ink:#141412; --ink-2:#52514e; --muted:#7d7b75;
+  --line:#e1e0d9; --axis:#c3c2b7; --accent:#1c5cab; --accent-soft:#e6eefa; --label:#fff9e6; --label-line:#e8d9a6;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100;
+  --good:#0ca30c; --good-ink:#006300; --warn:#fab219; --bad:#d03b3b;
+  --f-display:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121211; --surface:#1a1a19; --ink:#f0efec; --ink-2:#c3c2b7; --muted:#939189;
+  --line:#2c2c2a; --axis:#45453f; --accent:#6da7ec; --accent-soft:#1b2a3f; --label:#26231a; --label-line:#4a4330;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500;
+  --good:#0ca30c; --good-ink:#3fc23f; --warn:#fab219; --bad:#e66767; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121211; --surface:#1a1a19; --ink:#f0efec; --ink-2:#c3c2b7; --muted:#939189;
+  --line:#2c2c2a; --axis:#45453f; --accent:#6da7ec; --accent-soft:#1b2a3f; --label:#26231a; --label-line:#4a4330;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500;
+  --good:#0ca30c; --good-ink:#3fc23f; --warn:#fab219; --bad:#e66767; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6}
+.wrap{max-width:780px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:40px 80px;display:flex;flex-direction:column;gap:56px}
+h1,h2,h3{font-family:var(--f-display);line-height:1.15;text-wrap:balance;margin:0}
+h1{font-size:clamp(2rem,6vw,2.9rem);font-weight:700;letter-spacing:-.01em}
+h2{font-size:1.65rem;font-weight:600}
+h3{font-size:1.15rem;font-weight:600}
+p{margin:0;max-width:68ch}
+section{display:flex;flex-direction:column;gap:18px}
+.eyebrow{font-family:var(--f-mono);font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.sec-head{display:flex;flex-direction:column;gap:6px}
+.lead{font-size:1.1rem;color:var(--ink-2)}
+strong{font-weight:600}
+.verdict{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--warn);padding:18px 20px;display:flex;flex-direction:column;gap:8px}
+.verdict .tag{font-family:var(--f-mono);font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2)}
+.verdict p{font-size:1.05rem}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+.tile{background:var(--surface);border:1px solid var(--line);padding:14px 16px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.tile .k{font-size:.85rem;color:var(--ink-2)}
+.tile .v{font-family:var(--f-display);font-size:1.75rem;font-weight:600;line-height:1.1}
+.tile .n{font-size:.8rem;color:var(--muted)}
+.panel{background:var(--surface);border:1px solid var(--line);padding:18px 18px 12px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.panel .ptitle{font-weight:600}
+.panel .psub{font-size:.88rem;color:var(--ink-2)}
+.chart{position:relative;width:100%;min-width:0}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.chart text{font-family:var(--f-body);fill:var(--muted);font-size:12px}
+.chart .lbl{fill:var(--ink-2);font-size:12px}
+.chart .lbl-strong{fill:var(--ink);font-weight:600;font-size:12px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.85rem;color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:2px}
+.legend i.ln{height:3px;width:16px;border-radius:2px}
+.tip{position:absolute;pointer-events:none;background:var(--surface);border:1px solid var(--line);box-shadow:0 4px 14px rgba(0,0,0,.12);padding:8px 10px;font-size:.82rem;line-height:1.4;min-width:120px;z-index:5;white-space:nowrap}
+.tip .t{color:var(--muted);font-size:.75rem;margin-bottom:2px}
+.tip .r{display:flex;align-items:center;gap:8px}
+.tip .r b{font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
+.tip .r em{font-style:normal;color:var(--ink-2)}
+.tip .r i{display:inline-block;width:12px;height:3px;border-radius:2px}
+.note{font-size:.82rem;color:var(--muted)}
+details{font-size:.88rem}
+details summary{cursor:pointer;color:var(--accent);font-weight:500}
+details summary:focus-visible, button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tbl{overflow-x:auto;min-width:0;border:1px solid var(--line);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.88rem}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;color:var(--ink-2);font-size:.8rem;background:var(--bg)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+.neg{color:var(--bad)} .pos{color:var(--good-ink)}
+/* flow diagram */
+.flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:10px;align-items:stretch}
+.node{background:var(--surface);border:1px solid var(--line);padding:12px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.node.me{border:2px solid var(--accent);background:var(--accent-soft)}
+.node b{font-family:var(--f-display);font-size:1.05rem}
+.node small{color:var(--ink-2);font-size:.82rem;line-height:1.4}
+.arrow{align-self:center;color:var(--muted);font-family:var(--f-mono);font-size:.78rem;text-align:center;line-height:1.2}
+.arrow span{display:block;font-size:1.3rem;color:var(--ink-2)}
+@media (max-width:620px){.flow{grid-template-columns:1fr}.arrow span{transform:rotate(90deg)}}
+/* shipping-label steps */
+.steps{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;counter-reset:s}
+.step{background:var(--label);border:1px dashed var(--label-line);padding:12px 14px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.step .no{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.06em;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+.step b{font-weight:600}
+.step p{font-size:.88rem;color:var(--ink-2)}
+.phases{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.phase{background:var(--surface);border:1px solid var(--line);padding:14px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.phase .when{font-family:var(--f-mono);font-size:.74rem;color:var(--muted)}
+.phase .cash{font-family:var(--f-display);font-size:1.4rem;font-weight:600}
+.phase p{font-size:.86rem;color:var(--ink-2)}
+.gates{display:flex;flex-direction:column;gap:10px}
+.gate{display:grid;grid-template-columns:96px 1fr;gap:14px;background:var(--surface);border:1px solid var(--line);padding:14px}
+.gate .gid{font-family:var(--f-mono);font-size:.8rem;color:var(--ink-2)}
+.gate .gid b{display:block;font-family:var(--f-display);font-size:1.2rem;color:var(--ink)}
+.gate p{font-size:.92rem}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:.76rem;font-weight:600;padding:1px 8px;border-radius:999px;border:1px solid var(--line);color:var(--ink-2);white-space:nowrap}
+.pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.pill.ok{color:var(--good-ink)} .pill.no{color:var(--bad)}
+.conds{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none;counter-reset:c}
+.conds li{counter-increment:c;display:grid;grid-template-columns:32px 1fr;gap:10px;align-items:start;background:var(--surface);border:1px solid var(--line);padding:12px 14px}
+.conds li::before{content:counter(c);font-family:var(--f-display);font-weight:700;font-size:1.3rem;color:var(--accent);line-height:1.2}
+.conds li span{font-size:.94rem}
+.conds li small{display:block;color:var(--ink-2);font-size:.84rem;margin-top:2px}
+footer{font-size:.82rem;color:var(--muted);display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line);padding-top:18px}
+a{color:var(--accent)}
+@media (prefers-reduced-motion:no-preference){.chart .bar,.chart .seg{transition:opacity .12s}}
+</style>
+
+<div class="wrap">
+
+<header style="display:flex;flex-direction:column;gap:16px">
+  <div class="eyebrow">Hyderabad · business plan · researched Nov 2026</div>
+  <h1>Multi-carrier delivery hub</h1>
+  <p class="lead">One shop in a Hyderabad suburb that delivers parcels for several logistics companies, and also sells courier bookings to local people and sellers. This page explains how it works, what each step looks like, and what the numbers say.</p>
+  <div class="verdict">
+    <div class="tag">Short answer</div>
+    <p><strong>It can work, but slowly, and only under clear conditions.</strong> Delivering parcels for companies leaves you only about ₹3.50 a parcel. The real profit comes from the counter: walk-in courier bookings and shipping for local sellers. In the base case you need about <strong>₹11.5 lakh of cash at the lowest point</strong> (most of it is deposits and money the companies still owe you), the business becomes <strong>profitable every month from month 19</strong>, and it pays back in <strong>about 4 years</strong>.</p>
+  </div>
+  <div class="tiles">
+    <div class="tile"><span class="k">You keep per delivered parcel</span><span class="v">₹3.50</span><span class="n">₹19 paid − ₹14.50 rider − ₹1 losses</span></div>
+    <div class="tile"><span class="k">You keep per walk-in booking</span><span class="v">₹27</span><span class="n">₹68 price − ₹38 freight − ₹3 pack</span></div>
+    <div class="tile"><span class="k">Cash needed at lowest point</span><span class="v">₹11.5 L</span><span class="n">base · ₹3.9 L if rates are good</span></div>
+    <div class="tile"><span class="k">Payback</span><span class="v">~48 mo</span><span class="n">base · 17 months optimistic</span></div>
+  </div>
+</header>
+
+<section id="how">
+  <div class="sec-head"><span class="eyebrow">1 · How it works</span><h2>You rent out riders and space. You only own the counter customer.</h2></div>
+  <div class="flow" role="img" aria-label="Flow: logistics companies send parcels to your hub, your riders deliver them; walk-in customers and sellers book with you, and you ship through an aggregator.">
+    <div class="node"><b>Logistics companies</b><small>Shadowfax, Valmo, Delhivery, XpressBees, Amazon Hub. They own the customer, set the rate and decide how many parcels you get.</small></div>
+    <div class="arrow"><span>→</span>parcels each morning<br>₹ per delivery, monthly</div>
+    <div class="node me"><b>Your hub</b><small>500–600 sq ft shop. Separate rack, rider IDs and cash box for each company. Counter in front.</small></div>
+    <div class="arrow"><span>→</span>riders paid<br>per parcel</div>
+    <div class="node"><b>Customers' doors</b><small>Riders deliver, collect cash on delivery, and hand cash in the same day.</small></div>
+  </div>
+  <div class="flow" role="img" aria-label="Flow: walk-in customers and local sellers pay you; you book their parcels through Shiprocket or Ekart and keep the difference.">
+    <div class="node"><b>Walk-ins and local sellers</b><small>People sending a parcel, Meesho/Instagram sellers needing pickups and shipping.</small></div>
+    <div class="arrow"><span>→</span>they pay<br>your price</div>
+    <div class="node me"><b>Your counter</b><small>You set the price. This is the part you control, and where the margin is.</small></div>
+    <div class="arrow"><span>→</span>you book<br>at wholesale</div>
+    <div class="node"><b>Aggregators</b><small>Shiprocket (₹36–45 per shipment on average), Ekart booking wallet (no fee, no deposit).</small></div>
+  </div>
+  <p>Working with many companies does <strong>not</strong> make each parcel more profitable. Each company wants its own riders, app logins and cash ledger, so routes don't get denser. What it does is spread rent and staff over more parcels, and protect you if one company leaves. Valmo's public delivery agreement has no clause stopping you from working for others, but it can end the deal on <strong>3 working days' notice</strong> and change fees at any time. Read every contract before signing.</p>
+</section>
+
+<section id="process">
+  <div class="sec-head"><span class="eyebrow">2 · The process</span><h2>From application to first payment: 6–10 weeks per company</h2></div>
+  <p>The same nine steps apply to almost every company. Companies approve partners when a PIN code needs one, not in the order people apply.</p>
+  <div class="steps">
+    <div class="step"><div class="no"><span>STEP 1</span><span>same day</span></div><b>Apply</b><p>Online form, partner app or email.</p></div>
+    <div class="step"><div class="no"><span>STEP 2</span><span>days–weeks</span></div><b>Call from area team</b><p>They ask about your PIN codes, space, riders and background.</p></div>
+    <div class="step"><div class="no"><span>STEP 3</span><span>1–2 weeks</span></div><b>Site visit, PIN check</b><p>They inspect CCTV, racks, road access and confirm the territory.</p></div>
+    <div class="step"><div class="no"><span>STEP 4</span><span>~1 week</span></div><b>KYC and security</b><p>PAN, Aadhaar, Udyam, GST, bank, rent agreement; blank cheques or a refundable deposit.</p></div>
+    <div class="step"><div class="no"><span>STEP 5</span><span>days</span></div><b>Agreement</b><p>Often a click in the app. Check exclusivity, penalties, notice and rate-change clauses.</p></div>
+    <div class="step"><div class="no"><span>STEP 6</span><span>days</span></div><b>Logins and training</b><p>Rider IDs created, scanners and label printing set up.</p></div>
+    <div class="step"><div class="no"><span>STEP 7</span><span>~12–15 days total</span></div><b>First load</b><p>Parcels arrive in a morning van. (Shadowfax timing, third-party source.)</p></div>
+    <div class="step"><div class="no"><span>STEP 8</span><span>month end</span></div><b>Reconcile and invoice</b><p>Check their statement against your deliveries, returns, penalties and cash. Raise a GST invoice.</p></div>
+    <div class="step"><div class="no"><span>STEP 9</span><span>30–45 days after first parcel</span></div><b>First payment</b><p>Bank transfer, minus 1–2% TDS.</p></div>
+  </div>
+
+  <h3>Where to apply</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Company</th><th>How to apply</th><th>What they publish about money</th></tr></thead>
+    <tbody>
+      <tr><td>Shadowfax</td><td>Franchise form on shadowfax.in, or franchise.onboarding@shadowfax.in. Needs 500–600 sq ft, PC, printer, scanner, 2+ CCTV, 50 kg scale, label printer, racks, a centre manager and at least 1 rider.</td><td>"Does not charge any fee"</td></tr>
+      <tr><td>Valmo (Meesho)</td><td>Valmo partner app ("Captain" = hub owner)</td><td>Paid against your invoice, TDS deducted. Says it never asks money for hub allocation.</td></tr>
+      <tr><td>Ekart booking counter</td><td>Elite portal sign-up, then a call</td><td>No fee, no deposit, no royalty. Prepaid wallet. You set your own price.</td></tr>
+      <tr><td>Delhivery</td><td>Local Delivery Franchise page on delhivery.com</td><td>Paid per shipment. Deposit not official (third-party claims ₹50,000–3 lakh).</td></tr>
+      <tr><td>XpressBees</td><td>No official form found; third-party sources describe form, call and site check</td><td>Not public. XpressBees warns of fake franchise offers.</td></tr>
+      <tr><td>Amazon Hub Delivery</td><td>amazon.in/ihs. Needs a store, space and off-peak time to deliver within 2–4 km.</td><td>"Fixed amount for each delivery"; rate not published. 20–60 parcels a day at partner stores.</td></tr>
+      <tr><td>India Post franchise</td><td>Form to the area Superintendent of Post Offices</td><td>About ₹5,000 deposit; commission per article.</td></tr>
+      <tr><td>Shiprocket</td><td>Online sign-up</td><td>Free plan at ₹45 average per shipment; ₹199–799/month plans bring it to ₹41–36.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Tax, with one invoice</h3>
+  <p>Delivery work is a courier service (SAC 9968) taxed at <strong>18% GST</strong>. Register from day one. Companies deduct <strong>TDS of 1%</strong> if you are a proprietor (2% for a firm). Example: 4,000 parcels × ₹19 = ₹76,000, plus ₹13,680 GST = ₹89,680 invoice. The company deducts about ₹760 TDS and transfers about ₹88,900. The TDS comes back as an income-tax credit. The GST is often due before the company pays you, which is one reason you need working capital.</p>
+</section>
+
+<section id="units">
+  <div class="sec-head"><span class="eyebrow">3 · Money per unit</span><h2>Each kind of work earns a very different amount</h2></div>
+  <div class="panel">
+    <div class="ptitle">What you keep per parcel or order, after direct costs</div>
+    <div class="psub">Bar = base case. Line = low to high range. ₹ per unit.</div>
+    <div class="chart" id="c-margin"></div>
+    <details><summary>Show as table</summary><div class="tbl" id="t-margin"></div></details>
+  </div>
+  <p>Last-mile delivery is mostly pass-through: riders take ₹14.50 of every ₹19. That matches the big companies' own filings. Shadowfax, with ₹1,806 crore half-year revenue, keeps only a <strong>3.56% EBITDA margin</strong>. So use delivery work to bring parcels and footfall, and make your profit at the counter.</p>
+  <p class="note">Delivery payouts (₹14–25 a parcel) come from unofficial sources; no company publishes a rate card. Rider cost ₹12–17 comes from Hyderabad job listings. Counter prices ₹60–100 come from courier blogs; Shiprocket costs are from its official pricing page.</p>
+</section>
+
+<section id="demand">
+  <div class="sec-head"><span class="eyebrow">4 · Demand</span><h2>There are enough parcels. The limit is how many PIN codes you are given.</h2></div>
+  <p>India shipped <strong>4.9–5.3 billion e-commerce parcels in FY25</strong> (about 14 million a day), growing 23–27% a year. No source gives Hyderabad's share; at an assumed 3–4%, the city moves about <strong>0.5–0.7 million parcels a day</strong>. A hub doing 480 a day is under 0.1% of that.</p>
+  <div class="panel">
+    <div class="ptitle">Who carries India's e-commerce parcels (H1 FY26, % of shipments)</div>
+    <div class="psub">Midpoints of ranges from the Redseer report in Shadowfax's IPO papers. Ekart and Amazon don't publish a split.</div>
+    <div class="chart" id="c-share"></div>
+    <details><summary>Show as table</summary><div class="tbl" id="t-share"></div></details>
+  </div>
+  <p>Ekart and Amazon mostly use their own networks. The companies that hand last-mile work to local partners are <strong>Shadowfax, Valmo, Delhivery, XpressBees</strong>, and Amazon through Hub Delivery.</p>
+  <div class="panel">
+    <div class="ptitle">Parcel volume through the year (average month ≈ 100)</div>
+    <div class="psub">Estimated from Delhivery's FY26 quarterly volumes. No monthly series is published, so treat this as a shape, not exact figures.</div>
+    <div class="chart" id="c-season"></div>
+    <details><summary>Show as table</summary><div class="tbl" id="t-season"></div></details>
+  </div>
+  <p>October is about <strong>1.6× February</strong>, and peak days run 2–3× normal. Returns arrive 1–3 weeks after the peak. That is why the plan starts in February: learn in the quiet months, and have two companies live before September.</p>
+</section>
+
+<section id="plan">
+  <div class="sec-head"><span class="eyebrow">5 · The plan</span><h2>Four phases. Money is released only when the numbers pass a check.</h2></div>
+  <div class="phases">
+    <div class="phase"><span class="when">PHASE 0 · NOV 2026–JAN 2027</span><b>Test first</b><span class="cash">₹20,000</span><p>Register the business. Ride 2–3 weeks as a per-parcel rider in your target PIN codes. Apply everywhere and collect written rates.</p></div>
+    <div class="phase"><span class="when">PHASE 1 · MONTHS 1–5</span><b>Counter + Amazon Hub + one company</b><span class="cash">₹4.6 L</span><p>500–600 sq ft at ~₹15,000/month. One assistant. 1–4 riders on per-parcel pay.</p></div>
+    <div class="phase"><span class="when">PHASE 2 · MONTHS 6–12</span><b>Second company + seller accounts</b><span class="cash">₹2.8 L more</span><p>Add a supervisor, a part-time accountant from month 10, 5–9 riders. Second company from a different group.</p></div>
+    <div class="phase"><span class="when">PHASE 3 · MONTHS 13–24</span><b>Third company + packing for sellers</b><span class="cash">₹3.8 L more</span><p>Move to ~1,200 sq ft (₹27,000/month). Add a packer from month 18. 7–13 riders.</p></div>
+  </div>
+  <div class="panel">
+    <div class="ptitle">Where the ₹11.45 lakh goes (base case, up to the lowest cash point in month 21)</div>
+    <div class="psub">Only about ₹1.3 lakh is actual losses. Most of the rest comes back.</div>
+    <div class="chart" id="c-invest"></div>
+    <div class="legend" id="l-invest"></div>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>Phase</th><th class="num">Equipment</th><th class="num">Deposits (refundable)</th><th class="num">Losses</th><th class="num">Unpaid invoices + GST timing</th><th class="num">Total</th></tr></thead>
+    <tbody>
+      <tr><td>0. Test</td><td class="num">20,000</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">20,000</td></tr>
+      <tr><td>1. Launch</td><td class="num">1,60,000</td><td class="num">95,000</td><td class="num">97,672</td><td class="num">1,08,524</td><td class="num">4,61,196</td></tr>
+      <tr><td>2. Second company</td><td class="num">25,000</td><td class="num">50,000</td><td class="num">71,768</td><td class="num">1,33,522</td><td class="num">2,80,290</td></tr>
+      <tr><td>3. Third company + packing</td><td class="num">60,000</td><td class="num">86,000</td><td class="num pos">−38,208 (profit)</td><td class="num">2,75,797</td><td class="num">3,83,589</td></tr>
+      <tr><td><strong>Total</strong></td><td class="num"><strong>2,65,000</strong></td><td class="num"><strong>2,31,000</strong></td><td class="num"><strong>1,31,232</strong></td><td class="num"><strong>5,17,843</strong></td><td class="num"><strong>11,45,075</strong></td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">Keep another ₹1 lakh as contingency. Company deposits are assumed at ₹50,000 each, because none is published. In the optimistic case (₹21 rate, zero deposits) the lowest point is only ₹3.9 lakh.</p>
+  <div class="panel">
+    <div class="ptitle">People on the team, by phase (highest month)</div>
+    <div class="chart" id="c-heads"></div>
+    <div class="legend" id="l-heads"></div>
+  </div>
+  <p>Riders on ₹14.50 a parcel earn about ₹17,000–21,000 a month at 45–55 deliveries a day, above Telangana's ₹16,000 minimum wage. Rider churn is high, so the model budgets for replacing 10% of riders every month.</p>
+</section>
+
+<section id="pnl">
+  <div class="sec-head"><span class="eyebrow">6 · Monthly profit</span><h2>Base case: first profit in the October festival, steady profit from month 19</h2></div>
+  <div class="panel">
+    <div class="ptitle">Net profit per month, before paying yourself (₹)</div>
+    <div class="psub">Feb 2027 = month 1. Three scenarios.</div>
+    <div class="legend" id="l-profit"></div>
+    <div class="chart" id="c-profit"></div>
+    <details><summary>Show as table</summary><div class="tbl" id="t-profit"></div></details>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>Scenario</th><th>Key inputs</th></tr></thead>
+    <tbody>
+      <tr><td>Pessimistic</td><td>₹16 per parcel, rider ₹14.50, losses ₹1.50, 65% of base volume, companies pay at 60 days, main company cuts volume 40% at month 15</td></tr>
+      <tr><td>Base</td><td>₹19 per parcel, rider ₹14.50, losses ₹1, companies pay half at 30 and half at 60 days</td></tr>
+      <tr><td>Optimistic</td><td>₹21 per parcel, rider ₹14, losses ₹0.80, 130% of base volume, paid at 30 days</td></tr>
+    </tbody>
+  </table></div>
+  <div class="panel">
+    <div class="ptitle">Where revenue comes from as the hub grows (base case, ₹ per month)</div>
+    <div class="psub">At month 24, delivery work is 52% of revenue but only 34% of the profit before fixed costs.</div>
+    <div class="legend" id="l-mix"></div>
+    <div class="chart" id="c-mix"></div>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>Base case, ₹ per month</th><th class="num">Month 3</th><th class="num">Month 6</th><th class="num">Month 12</th><th class="num">Month 24</th></tr></thead>
+    <tbody>
+      <tr><td>Delivery parcels per day</td><td class="num">101</td><td class="num">232</td><td class="num">313</td><td class="num">483</td></tr>
+      <tr><td>Walk-ins / seller shipments / packing orders per day</td><td class="num">14 / 0 / 0</td><td class="num">25 / 17 / 0</td><td class="num">34 / 37 / 0</td><td class="num">43 / 83 / 74</td></tr>
+      <tr><td>Riders</td><td class="num">3</td><td class="num">5</td><td class="num">7</td><td class="num">9</td></tr>
+      <tr><td><strong>Total revenue</strong></td><td class="num">74,876</td><td class="num">1,80,426</td><td class="num">2,61,768</td><td class="num">4,60,892</td></tr>
+      <tr><td>Rider pay</td><td class="num">38,171</td><td class="num">87,285</td><td class="num">1,17,926</td><td class="num">1,82,091</td></tr>
+      <tr><td>Losses, debits, COD bank charges</td><td class="num">2,632</td><td class="num">6,020</td><td class="num">8,133</td><td class="num">12,558</td></tr>
+      <tr><td>Freight bought from aggregators</td><td class="num">14,988</td><td class="num">44,665</td><td class="num">75,046</td><td class="num">1,34,316</td></tr>
+      <tr><td>Packing materials</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">3,827</td></tr>
+      <tr><td>Salaried staff</td><td class="num">16,520</td><td class="num">37,170</td><td class="num">47,170</td><td class="num">63,690</td></tr>
+      <tr><td>Rent</td><td class="num">15,000</td><td class="num">15,000</td><td class="num">15,000</td><td class="num">27,000</td></tr>
+      <tr><td>Overheads, recruiting, insurance</td><td class="num">8,000</td><td class="num">11,000</td><td class="num">11,000</td><td class="num">16,000</td></tr>
+      <tr><td><strong>Net profit</strong></td><td class="num neg"><strong>−20,436</strong></td><td class="num neg"><strong>−20,714</strong></td><td class="num neg"><strong>−12,507</strong></td><td class="num pos"><strong>+21,409</strong></td></tr>
+      <tr><td>Biggest company's share of revenue</td><td class="num">49%</td><td class="num">40%</td><td class="num">31%</td><td class="num">20%</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="cash">
+  <div class="sec-head"><span class="eyebrow">7 · Cash</span><h2>How deep the cash goes, and when it comes back</h2></div>
+  <div class="panel">
+    <div class="ptitle">Total cash in or out since the start (₹)</div>
+    <div class="psub">Includes equipment, deposits, losses, GST and waiting to be paid. Month 0 = Jan 2027 fit-out.</div>
+    <div class="legend" id="l-cash"></div>
+    <div class="chart" id="c-cash"></div>
+    <details><summary>Show as table</summary><div class="tbl" id="t-cash"></div></details>
+  </div>
+  <p>The pessimistic line shows what happens if you ignore the stop checks: about ₹20 lakh gone by month 24. If you stop at the month-5 check, about ₹5.8 lakh has gone out, about ₹2.3 lakh of it comes back, and the <strong>net loss is roughly ₹3 lakh</strong>. The base case stays below zero past month 24; extended at 10% yearly growth, it turns positive around <strong>month 48</strong>.</p>
+
+  <h3>What changes the answer most</h3>
+  <div class="panel">
+    <div class="ptitle">Months to pay back, changing one thing at a time (base = ~48)</div>
+    <div class="psub">Shorter is better. "No" = does not pay back within 5 years.</div>
+    <div class="chart" id="c-sens"></div>
+    <details><summary>Show as table</summary><div class="tbl" id="t-sens"></div></details>
+  </div>
+  <p>Every ₹1 per parcel, whether in the rate you get, what you pay riders, or losses, moves payback by 4–12 months. The biggest thing in your own hands is <strong>running the floor yourself</strong> in year 1 instead of hiring a supervisor.</p>
+</section>
+
+<section id="gates">
+  <div class="sec-head"><span class="eyebrow">8 · Stop checks</span><h2>Three checks before each release of money</h2></div>
+  <div class="gates">
+    <div class="gate"><div class="gid">Check 0<b>Day 60</b></div><div><p>Before signing a lease. Pass only if one company gives in writing <strong>₹19+ per parcel and 100+ parcels a day</strong> for named PIN codes, a second company from another group is in talks, deposit and refund terms are written, and there is no exclusivity clause.</p><p style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap"><span class="pill ok">Base: pass</span><span class="pill no">Pessimistic: fails on ₹16 rate</span></p></div></div>
+    <div class="gate"><div class="gid">Check 1<b>Month 5</b></div><div><p>Before the second deposit and the supervisor. Pass only if the average loss over months 3–5 is <strong>under ₹20,000 and shrinking</strong>, companies pay within 45 days, and losses are under ₹1.50 a parcel.</p><p style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap"><span class="pill ok">Base: pass (₹13,554)</span><span class="pill no">Pessimistic: fail (₹32,961)</span></p></div></div>
+    <div class="gate"><div class="gid">Check 2<b>Month 12</b></div><div><p>Before expanding. Pass only if the average loss over months 10–12 is <strong>under ₹15,000</strong> and a third company, or at least three sellers committing to packing volume, is ready.</p><p style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap"><span class="pill ok">Base: narrow pass (₹10,802)</span></p></div></div>
+  </div>
+</section>
+
+<section id="risks">
+  <div class="sec-head"><span class="eyebrow">9 · Risks</span><h2>Businesses like this fail when a client leaves or pays late</h2></div>
+  <p><strong>Ecom Express</strong> let one client (almost certainly Meesho) reach 52% of revenue. Meesho moved its parcels to its own network, Valmo; Ecom closed about 1,000 delivery centres and was sold cheaply to Delhivery. <strong>Dunzo</strong> left suppliers unpaid, including about ₹4 crore owed to the firm that recruited its riders. Even Shadowfax gets 48.9% of its revenue from Flipkart.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Risk</th><th>How it shows up</th><th>What to do</th></tr></thead>
+    <tbody>
+      <tr><td>Rate falls</td><td>Company revises rates; delivery margin goes to zero</td><td>Pay riders per parcel; short lease lock-in; build counter and seller work to half your profit</td></tr>
+      <tr><td>One big client</td><td>One company above 40% of revenue</td><td>Second company from a different group by month 6, third by month 13. Count Flipkart, Ekart and Shadowfax as one group.</td></tr>
+      <tr><td>Slow payment</td><td>Paid in 30–60 days, GST due before cash arrives</td><td>Keep 1.5–2 months of rider pay in cash; invoice on day 1 of the month</td></tr>
+      <tr><td>Lost parcels and cash</td><td>Lost parcels charged at full value; cash shortfalls deducted</td><td>CCTV on every zone; same-day cash deposit; separate cash box per company</td></tr>
+      <tr><td>Fake franchise offers</td><td>"You're approved, now pay a fee"</td><td>Only official websites and area managers. Never pay a personal account.</td></tr>
+      <tr><td>Rider churn</td><td>10%+ of riders leave each month</td><td>Referral bonus; ₹20/year PMSBY accident cover; keep each rider above 45 parcels a day</td></tr>
+      <tr><td>Exclusivity clause</td><td>Contract bans other companies on your premises</td><td>Read before signing; keep separate zones; tell each company about the others</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="go">
+  <div class="sec-head"><span class="eyebrow">10 · Decision</span><h2>Go ahead only if all five are true</h2></div>
+  <ol class="conds">
+    <li><span><strong>A written rate of ₹19 or more per delivered parcel</strong>, ideally ₹20–21, with rider pay at ₹14.50 or less.<small>At ₹17 the base case does not pay back in 5 years. At ₹21 it pays back in about 35 months.</small></span></li>
+    <li><span><strong>Two companies from different groups live before the first festive season.</strong> No single company above 40% after month 12.<small>Ecom Express failed at 52% from one client.</small></span></li>
+    <li><span><strong>Counter, seller shipping and packing</strong> giving at least half your profit by month 24.<small>Delivery work alone cannot cover rent and staff. In the base case these give 66%.</small></span></li>
+    <li><span><strong>Access to about ₹11–12 lakh in three parts</strong> (₹5 lakh to start), or about ₹4 lakh if optimistic rates are confirmed in writing.<small>Most of it is deposits and invoices waiting to be paid.</small></span></li>
+    <li><span><strong>You run the floor yourself in year 1, and you stop at the month-5 check</strong> if the numbers say stop.<small>Saves about ₹3.3 lakh of cash and 13 months of payback, and limits the loss to about ₹3 lakh.</small></span></li>
+  </ol>
+  <p>If you can't meet conditions 1 and 4, do the smaller version: a counter with aggregator bookings and Amazon Hub Delivery from a small shop, with no delivery hub.</p>
+
+  <h3>First 90 days</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Dates</th><th>Do this</th><th>Done when</th></tr></thead>
+    <tbody>
+      <tr><td>9–22 Nov 2026</td><td>Register a proprietorship; get Udyam, GST and a current account. Pick 2–3 PIN clusters (e.g. Kukatpally–Miyapur, Kompally–Alwal, Uppal–LB Nagar). Apply to Shadowfax, Valmo, Delhivery, XpressBees, Ekart Elite and Amazon Hub.</td><td>All applications sent</td></tr>
+      <tr><td>23 Nov–8 Dec</td><td>Ride 2–3 weeks as a per-parcel rider in your target area. Visit 3–5 courier counters (Ameerpet, Kukatpally, Dilsukhnagar) and note prices. Open a Shiprocket account. Shortlist shops, <strong>sign nothing</strong>.</td><td>Notes on real rates, volumes, prices</td></tr>
+      <tr><td>9–23 Dec</td><td>Meet area managers. Ask in writing for: rate card (delivery, return pickup, failed delivery, COD), 3 months of PIN volume, deposit and refund terms, penalty list, payment cycle, draft agreement. Have a CA review.</td><td>At least 2 written offers</td></tr>
+      <tr><td>24 Dec–7 Jan 2027</td><td><strong>Check 0.</strong> If it passes, sign an 11-month lease with short lock-in and release the first ₹5 lakh.</td><td>Lease signed, or plan paused</td></tr>
+      <tr><td>8–22 Jan</td><td>Fit-out: CCTV per zone, racks, label printer, scanners, scale, inverter. Hire the counter assistant. Recruit 3–4 riders with police verification and accident cover.</td><td>Site approved, rider IDs active</td></tr>
+      <tr><td>23 Jan–6 Feb</td><td>First parcels; counter opens. Daily cash deposit routine; weekly profit check per company; first GST invoice at month end. Start visiting local sellers.</td><td>First load delivered; first payment expected early–mid March</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<footer>
+  <p><strong>What these numbers are.</strong> Figures marked as sourced come from company pages, filings (Shadowfax, Delhivery, Meesho), Redseer, job listings and price pages, gathered in November 2026. No company publishes its per-parcel hub rate, PIN-code volume or deposit, so those, all volumes, staffing dates and the monthly seasonality curve are assumptions inside the sourced ranges. Marketing claims like "earn ₹30,000–90,000 a month" are not used as facts; most of them are revenue, not profit. Profit is before income tax and before any pay for the owner.</p>
+  <p>Full written report with every source link: <code>reports/Multi carrier delivery hub plan.md</code> in the project.</p>
+</footer>
+</div>
+
+<script>
+(function(){
+  const inr = n => (n<0?'−':'') + '₹' + Math.abs(Math.round(n)).toLocaleString('en-IN');
+  const lakh = n => { const a=Math.abs(n)/1e5; return (n<0?'−':'')+'₹'+(a>=10?a.toFixed(1):a.toFixed(2)).replace(/\.0+$/,'')+' L'; };
+  const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+  const NS='http://www.w3.org/2000/svg';
+  function el(tag, attrs, parent){ const e=document.createElementNS(NS,tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(parent) parent.appendChild(e); return e; }
+  function txt(parent, x, y, s, attrs){ const t=el('text', Object.assign({x,y},attrs||{}), parent); t.textContent=s; return t; }
+  function niceTicks(min,max,count){
+    const span=max-min; const step0=span/count; const mag=Math.pow(10,Math.floor(Math.log10(step0)));
+    const err=step0/mag; const step=(err>=7.5?10:err>=3.5?5:err>=1.5?2:1)*mag;
+    const lo=Math.floor(min/step)*step, hi=Math.ceil(max/step)*step; const out=[];
+    for(let v=lo; v<=hi+step/2; v+=step) out.push(Math.round(v*1e6)/1e6); return out;
+  }
+  // Tooltip
+  function tipFor(container){
+    let t=container.querySelector('.tip'); if(!t){ t=document.createElement('div'); t.className='tip'; t.hidden=true; container.appendChild(t); }
+    return {
+      show(title, rows, x, y){
+        t.replaceChildren(); const h=document.createElement('div'); h.className='t'; h.textContent=title; t.appendChild(h);
+        rows.forEach(r=>{ const d=document.createElement('div'); d.className='r'; if(r.color){ const i=document.createElement('i'); i.style.background=r.color; d.appendChild(i);} const b=document.createElement('b'); b.textContent=r.value; d.appendChild(b); if(r.label){ const e=document.createElement('em'); e.textContent=r.label; d.appendChild(e);} t.appendChild(d); });
+        t.hidden=false; const cw=container.clientWidth; const tw=t.offsetWidth; let left=x+14; if(left+tw>cw) left=Math.max(0,x-tw-14); t.style.left=left+'px'; t.style.top=Math.max(0,y-10)+'px';
+      },
+      hide(){ t.hidden=true; }
+    };
+  }
+  function legend(id, items, kind){
+    const L=document.getElementById(id); if(!L) return; L.replaceChildren();
+    items.forEach(it=>{ const s=document.createElement('span'); const i=document.createElement('i'); if(kind==='line') i.className='ln'; i.style.background=it.color; s.appendChild(i); s.appendChild(document.createTextNode(it.name)); L.appendChild(s); });
+  }
+  function table(id, head, rows){
+    const host=document.getElementById(id); if(!host) return; const tb=document.createElement('table');
+    const th=document.createElement('thead'); const tr=document.createElement('tr'); head.forEach((h,i)=>{ const c=document.createElement('th'); c.textContent=h; if(i>0) c.className='num'; tr.appendChild(c); }); th.appendChild(tr); tb.appendChild(th);
+    const body=document.createElement('tbody'); rows.forEach(r=>{ const tr=document.createElement('tr'); r.forEach((v,i)=>{ const c=document.createElement('td'); c.textContent=v; if(i>0) c.className='num'; tr.appendChild(c); }); body.appendChild(tr); }); tb.appendChild(body); host.replaceChildren(tb);
+  }
+
+  // ---------- Data ----------
+  const margin=[
+    ['Last-mile delivery for a company',0,3.5,6.2],
+    ['First-mile pickup for a company',3,5.5,8],
+    ['India Post counter article',3,4,5],
+    ['Shipping for a local seller',5,9,14],
+    ['Packing orders for sellers',13,18,23],
+    ['Brand courier counter booking',20,25,30],
+    ['Walk-in booking via aggregator',18,27,35]
+  ];
+  const share=[['Ekart + Amazon (combined)',40],['Valmo (Meesho)',19.5],['Delhivery (incl. Ecom Express)',18.5],['Shadowfax',9],['XpressBees, Blue Dart, India Post, others',13]];
+  const season=[['Jan',92],['Feb',88],['Mar',95],['Apr',90],['May',92],['Jun',92],['Jul',98],['Aug',102],['Sep',115],['Oct',140],['Nov',112],['Dec',104]];
+  const cal=['Feb-27','Mar-27','Apr-27','May-27','Jun-27','Jul-27','Aug-27','Sep-27','Oct-27','Nov-27','Dec-27','Jan-28','Feb-28','Mar-28','Apr-28','May-28','Jun-28','Jul-28','Aug-28','Sep-28','Oct-28','Nov-28','Dec-28','Jan-29'];
+  const pBase=[-32639,-24369,-20436,-11881,-8346,-20714,-15657,-8218,5228,-9961,-9939,-12507,-19587,-11331,-8495,-3483,3006,-4539,6119,23333,53185,33803,30456,21409];
+  const pPes=[-37232,-36139,-33743,-34205,-30935,-53002,-51969,-53340,-49261,-60238,-58471,-58631,-58449,-58719,-57100,-56306,-57209,-54429,-53326,-52565,-51622,-51540,-51956,-53032];
+  const pOpt=[-27962,-12466,-2088,10109,27756,21761,30461,48890,78504,53604,53125,55190,48249,65544,68590,64159,73156,91603,108831,144905,205649,160587,154622,136134];
+  const cBase=[-275000,-315384,-375624,-424221,-454868,-481196,-622650,-670461,-711937,-766334,-773268,-762042,-761486,-944561,-977451,-994636,-1007520,-1018033,-1048189,-1071652,-1099659,-1145075,-1085420,-1005647,-949757];
+  const cPes=[-325000,-366580,-425213,-484487,-532496,-577655,-645936,-711638,-917934,-1013878,-1086947,-1126654,-1178438,-1230315,-1298418,-1345862,-1492311,-1570345,-1636630,-1707036,-1784040,-1884434,-1945895,-1961844,-1998179];
+  const cOpt=[-225000,-264038,-320651,-336735,-344755,-388842,-394720,-383020,-371450,-358235,-259582,-201024,-155839,-210259,-166046,-93269,-46747,15113,74172,156305,239422,333120,589489,763621,938377];
+  const mix={labels:['Month 3','Month 6','Month 12','Month 24'], series:[
+    {name:'Delivery for companies',key:'--s1',v:[50018,114373,154523,238602]},
+    {name:'Walk-in counter',key:'--s2',v:[24858,43758,59405,76378]},
+    {name:'Seller shipping',key:'--s3',v:[0,22295,47840,107640]},
+    {name:'Packing for sellers',key:'--s4',v:[0,0,0,38272]}]};
+  const invest=[{name:'Unpaid invoices + GST timing',key:'--s1',v:517843},{name:'Equipment and set-up',key:'--s2',v:265000},{name:'Refundable deposits',key:'--s3',v:231000},{name:'Operating losses',key:'--s4',v:131232}];
+  const heads={labels:['Phase 0','Phase 1','Phase 2','Phase 3'], series:[{name:'Owner',key:'--s1',v:[1,1,1,1]},{name:'Salaried staff',key:'--s2',v:[0,1,3,4]},{name:'Riders',key:'--s3',v:[0,4,9,13]}]};
+  const sens=[['Base case',48,'~48'],['Rate ₹21 instead of ₹19',35,'~35'],['Rate ₹20',39,'~39'],['Rider pay ₹13.50',39,'~39'],['Volume 30% higher',34,'~34'],['Owner runs the floor',35,'~35'],['Walk-ins 50% higher',37,'~37'],['Companies pay at 30 days',46,'~46'],['Companies pay at 60 days',50,'~50'],['Main company cuts volume 40%',51,'~51'],['Losses ₹2 per parcel',60,'~60'],['Rate ₹17',null,'No'],['Volume 20% lower',null,'No']];
+
+  // ---------- Chart builders ----------
+  function hbarRange(id){
+    const c=document.getElementById(id); c.querySelectorAll('svg').forEach(s=>s.remove()); const W=Math.max(300,c.clientWidth); const narrow=W<520;
+    const labW=narrow?0:220, rowH=narrow?48:34, top=8, H=top+margin.length*rowH+28; const x0=labW+4, x1=W-40;
+    const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,role:'img','aria-label':'Margin per unit by revenue stream'}); c.prepend(svg);
+    const max=36; const sx=v=>x0+(v/max)*(x1-x0); const tip=tipFor(c);
+    niceTicks(0,max,6).filter(t=>t<=max).forEach(t=>{ el('line',{x1:sx(t),x2:sx(t),y1:top,y2:H-24,stroke:css('--line')},svg); txt(svg,sx(t),H-8,'₹'+t,{'text-anchor':'middle'}); });
+    margin.forEach((m,i)=>{
+      const yTop=top+i*rowH; const bh=12; const by=narrow?yTop+22:yTop+(rowH-bh)/2;
+      txt(svg, narrow?x0:labW, narrow?yTop+14:by+bh-2, m[0], {'class':'lbl','text-anchor':narrow?'start':'end'});
+      const g=el('g',{tabindex:0,'class':'bar'},svg);
+      el('rect',{x:x0,y:by,width:Math.max(4,sx(m[2])-x0),height:bh,rx:3,fill:css('--s1')},g);
+      el('line',{x1:sx(m[1]),x2:sx(m[3]),y1:by+bh/2,y2:by+bh/2,stroke:css('--ink-2'),'stroke-width':1.5},g);
+      [m[1],m[3]].forEach(v=>el('line',{x1:sx(v),x2:sx(v),y1:by+1,y2:by+bh-1,stroke:css('--ink-2'),'stroke-width':1.5},g));
+      txt(g, sx(m[3])+6, by+bh-2, '₹'+m[2], {'class':'lbl-strong'});
+      el('rect',{x:0,y:yTop,width:W,height:rowH,fill:'transparent'},g);
+      const show=e=>{ const r=c.getBoundingClientRect(); const px=e&&e.clientX?e.clientX-r.left:sx(m[2]); const py=e&&e.clientY?e.clientY-r.top:by; g.style.opacity=.85; tip.show(m[0],[{value:'₹'+m[2],label:'base',color:css('--s1')},{value:'₹'+m[1]+' – ₹'+m[3],label:'low to high'}],px,py); };
+      g.addEventListener('pointermove',show); g.addEventListener('focus',()=>show()); g.addEventListener('pointerleave',()=>{g.style.opacity=1;tip.hide();}); g.addEventListener('blur',()=>{g.style.opacity=1;tip.hide();});
+    });
+  }
+  function hbarSimple(id, data, fmt, opts){
+    opts=opts||{}; const c=document.getElementById(id); c.querySelectorAll('svg').forEach(s=>s.remove()); const W=Math.max(300,c.clientWidth); const narrow=W<520;
+    const labW=narrow?0:230, rowH=narrow?46:32, top=4, H=top+data.length*rowH+(opts.axis?26:4); const x0=labW+4, x1=W-50;
+    const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,role:'img','aria-label':opts.aria||''}); c.prepend(svg);
+    const vals=data.map(d=>d[1]).filter(v=>v!=null); const max=opts.max||Math.max(...vals); const sx=v=>x0+(v/max)*(x1-x0); const tip=tipFor(c);
+    if(opts.ref!=null){ el('line',{x1:sx(opts.ref),x2:sx(opts.ref),y1:top,y2:H-(opts.axis?22:0),stroke:css('--axis'),'stroke-dasharray':'3 3'},svg); }
+    if(opts.axis){ niceTicks(0,max,5).filter(t=>t<=max).forEach(t=>{ txt(svg,sx(t),H-6,String(t),{'text-anchor':'middle'}); }); }
+    data.forEach((d,i)=>{
+      const yTop=top+i*rowH, bh=12, by=narrow?yTop+22:yTop+(rowH-bh)/2;
+      txt(svg, narrow?x0:labW, narrow?yTop+14:by+bh-2, d[0], {'class':'lbl','text-anchor':narrow?'start':'end'});
+      const g=el('g',{tabindex:0,'class':'bar'},svg);
+      const color=(opts.colorFn?opts.colorFn(d,i):css('--s1'));
+      if(d[1]!=null){ el('rect',{x:x0,y:by,width:Math.max(4,sx(d[1])-x0),height:bh,rx:3,fill:color},g); }
+      txt(g, (d[1]!=null?sx(d[1]):x0)+6, by+bh-2, d[2]||fmt(d[1]), {'class':'lbl-strong'});
+      el('rect',{x:0,y:yTop,width:W,height:rowH,fill:'transparent'},g);
+      const show=e=>{ const r=c.getBoundingClientRect(); const px=e&&e.clientX?e.clientX-r.left:x0; const py=e&&e.clientY?e.clientY-r.top:by; g.style.opacity=.85; tip.show(d[0],[{value:d[2]||fmt(d[1]),color:d[1]!=null?color:null,label:opts.unit||''}],px,py); };
+      g.addEventListener('pointermove',show); g.addEventListener('focus',()=>show()); g.addEventListener('pointerleave',()=>{g.style.opacity=1;tip.hide();}); g.addEventListener('blur',()=>{g.style.opacity=1;tip.hide();});
+    });
+  }
+  function vbars(id){
+    const c=document.getElementById(id); c.querySelectorAll('svg').forEach(s=>s.remove()); const W=Math.max(300,c.clientWidth); const H=230;
+    const m={l:36,r:8,t:18,b:26}; const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,role:'img','aria-label':'Seasonality index by month'}); c.prepend(svg);
+    const max=150; const sy=v=>m.t+(1-v/max)*(H-m.t-m.b); const bw=(W-m.l-m.r)/season.length; const tip=tipFor(c);
+    [0,50,100,150].forEach(t=>{ el('line',{x1:m.l,x2:W-m.r,y1:sy(t),y2:sy(t),stroke:t===0?css('--axis'):css('--line'),'stroke-dasharray':t===100?'4 3':''},svg); txt(svg,m.l-6,sy(t)+4,String(t),{'text-anchor':'end'}); });
+    season.forEach((d,i)=>{
+      const x=m.l+i*bw+2, w=bw-4; const g=el('g',{tabindex:0,'class':'bar'},svg);
+      const hl=d[0]==='Oct'||d[0]==='Feb';
+      el('path',{d:`M${x},${sy(0)} V${sy(d[1])+4} q0,-4 4,-4 H${x+w-4} q4,0 4,4 V${sy(0)} Z`,fill:hl?css('--s1'):css('--accent-soft'),stroke:hl?'none':css('--s1'),'stroke-width':hl?0:1},g);
+      txt(svg,x+w/2,H-8,d[0],{'text-anchor':'middle'});
+      if(hl) txt(svg,x+w/2,sy(d[1])-5,String(d[1]),{'text-anchor':'middle','class':'lbl-strong'});
+      el('rect',{x:m.l+i*bw,y:m.t,width:bw,height:H-m.t-m.b,fill:'transparent'},g);
+      const show=e=>{ const r=c.getBoundingClientRect(); g.style.opacity=.85; tip.show(d[0],[{value:String(d[1]),label:'index',color:css('--s1')}],e&&e.clientX?e.clientX-r.left:x,e&&e.clientY?e.clientY-r.top:sy(d[1])); };
+      g.addEventListener('pointermove',show); g.addEventListener('focus',()=>show()); g.addEventListener('pointerleave',()=>{g.style.opacity=1;tip.hide();}); g.addEventListener('blur',()=>{g.style.opacity=1;tip.hide();});
+    });
+  }
+  function lines(id, series, labels, startX, fmtY, aria){
+    const c=document.getElementById(id); c.querySelectorAll('svg').forEach(s=>s.remove()); const W=Math.max(300,c.clientWidth); const H=W<520?260:300;
+    const m={l:W<520?52:64,r:W<520?12:80,t:14,b:30}; const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,role:'img','aria-label':aria}); c.prepend(svg);
+    const all=series.flatMap(s=>s.v); const ticks=niceTicks(Math.min(0,...all),Math.max(0,...all),5); const lo=ticks[0], hi=ticks[ticks.length-1];
+    const n=series[0].v.length; const sx=i=>m.l+(i/(n-1))*(W-m.l-m.r); const sy=v=>m.t+(1-(v-lo)/(hi-lo))*(H-m.t-m.b); const tip=tipFor(c);
+    ticks.forEach(t=>{ el('line',{x1:m.l,x2:W-m.r,y1:sy(t),y2:sy(t),stroke:t===0?css('--axis'):css('--line'),'stroke-width':t===0?1.5:1},svg); txt(svg,m.l-6,sy(t)+4,fmtY(t),{'text-anchor':'end'}); });
+    const every=W<520?6:3; for(let i=0;i<n;i++){ const mo=i+startX; if(mo%every===0||i===0) txt(svg,sx(i),H-10,'M'+mo,{'text-anchor':'middle'}); }
+    series.forEach(s=>{ const col=css(s.key); el('path',{d:s.v.map((v,i)=>(i?'L':'M')+sx(i).toFixed(1)+','+sy(v).toFixed(1)).join(' '),fill:'none',stroke:col,'stroke-width':2,'stroke-linejoin':'round','stroke-linecap':'round'},svg);
+      if(W>=520){ const yl=sy(s.v[n-1]); txt(svg,W-m.r+8,yl+4,s.name,{'class':'lbl'}); }
+      if(s.mark!=null){ const i=s.mark; el('circle',{cx:sx(i),cy:sy(s.v[i]),r:5,fill:col,stroke:css('--surface'),'stroke-width':2},svg); if(s.markLabel) txt(svg,sx(i),sy(s.v[i])+(s.markBelow?20:-10),s.markLabel,{'text-anchor':'middle','class':'lbl-strong'}); }
+    });
+    const cross=el('line',{y1:m.t,y2:H-m.b,stroke:css('--axis'),'stroke-width':1,visibility:'hidden'},svg);
+    const dots=series.map(s=>el('circle',{r:4,fill:css(s.key),stroke:css('--surface'),'stroke-width':2,visibility:'hidden'},svg));
+    const hit=el('rect',{x:m.l,y:m.t,width:W-m.l-m.r,height:H-m.t-m.b,fill:'transparent',tabindex:0},svg);
+    let cur=n-1;
+    const showAt=(i,px,py)=>{ i=Math.max(0,Math.min(n-1,i)); cur=i; cross.setAttribute('x1',sx(i)); cross.setAttribute('x2',sx(i)); cross.setAttribute('visibility','visible');
+      dots.forEach((d,k)=>{ d.setAttribute('cx',sx(i)); d.setAttribute('cy',sy(series[k].v[i])); d.setAttribute('visibility','visible'); });
+      const scale=c.clientWidth/W; tip.show('Month '+(i+startX)+' · '+labels[i], series.map(s=>({value:inr(s.v[i]),label:s.name,color:css(s.key)})), px!=null?px:sx(i)*scale, py!=null?py:m.t*scale); };
+    hit.addEventListener('pointermove',e=>{ const r=svg.getBoundingClientRect(); const x=(e.clientX-r.left)*(W/r.width); const i=Math.round((x-m.l)/((W-m.l-m.r)/(n-1))); showAt(i,e.clientX-c.getBoundingClientRect().left,e.clientY-c.getBoundingClientRect().top); });
+    const hide=()=>{ cross.setAttribute('visibility','hidden'); dots.forEach(d=>d.setAttribute('visibility','hidden')); tip.hide(); };
+    hit.addEventListener('pointerleave',hide); hit.addEventListener('blur',hide); hit.addEventListener('focus',()=>showAt(cur));
+    hit.addEventListener('keydown',e=>{ if(e.key==='ArrowRight'){showAt(cur+1);e.preventDefault();} if(e.key==='ArrowLeft'){showAt(cur-1);e.preventDefault();} });
+  }
+  function stacked(id, data, fmt, aria, unit){
+    const c=document.getElementById(id); c.querySelectorAll('svg').forEach(s=>s.remove()); const W=Math.max(300,c.clientWidth); const H=250;
+    const m={l:W<520?48:60,r:8,t:18,b:28}; const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,role:'img','aria-label':aria}); c.prepend(svg);
+    const totals=data.labels.map((_,i)=>data.series.reduce((a,s)=>a+s.v[i],0)); const ticks=niceTicks(0,Math.max(...totals),4); const hi=ticks[ticks.length-1];
+    const sy=v=>m.t+(1-v/hi)*(H-m.t-m.b); const slot=(W-m.l-m.r)/data.labels.length; const bw=Math.min(72,slot*.55); const tip=tipFor(c);
+    ticks.forEach(t=>{ el('line',{x1:m.l,x2:W-m.r,y1:sy(t),y2:sy(t),stroke:t===0?css('--axis'):css('--line')},svg); txt(svg,m.l-6,sy(t)+4,fmt(t),{'text-anchor':'end'}); });
+    data.labels.forEach((lab,i)=>{
+      const x=m.l+i*slot+(slot-bw)/2; let acc=0; const nonzero=data.series.map((s,k)=>s.v[i]>0?k:-1).filter(k=>k>=0); const topK=nonzero[nonzero.length-1];
+      data.series.forEach((s,k)=>{ const v=s.v[i]; if(v<=0) return; const y0=sy(acc), y1=sy(acc+v); acc+=v; const h=y0-y1; const g=el('g',{tabindex:0,'class':'seg'},svg);
+        const gap=k===topK?0:2; const hh=Math.max(1,h-gap);
+        if(k===topK){ const r=Math.min(4,hh/2); el('path',{d:`M${x},${y0} V${y1+r} q0,-${r} ${r},-${r} H${x+bw-r} q${r},0 ${r},${r} V${y0} Z`,fill:css(s.key)},g); }
+        else el('rect',{x,y:y1+gap,width:bw,height:hh,fill:css(s.key)},g);
+        const show=e=>{ const r=c.getBoundingClientRect(); g.style.opacity=.8; tip.show(lab,[{value:fmt(v,true),label:s.name,color:css(s.key)},{value:fmt(totals[i],true),label:'total'+(unit?' '+unit:'')}],e&&e.clientX?e.clientX-r.left:x,e&&e.clientY?e.clientY-r.top:y1); };
+        g.addEventListener('pointermove',show); g.addEventListener('focus',()=>show()); g.addEventListener('pointerleave',()=>{g.style.opacity=1;tip.hide();}); g.addEventListener('blur',()=>{g.style.opacity=1;tip.hide();});
+      });
+      txt(svg,x+bw/2,sy(totals[i])-6,fmt(totals[i],true),{'text-anchor':'middle','class':'lbl-strong'});
+      txt(svg,x+bw/2,H-9,lab,{'text-anchor':'middle'});
+    });
+  }
+  function splitBar(id){
+    const c=document.getElementById(id); c.querySelectorAll('svg').forEach(s=>s.remove()); const W=Math.max(300,c.clientWidth); const H=W<520?96:70;
+    const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,role:'img','aria-label':'Breakdown of the 11.45 lakh cash need'}); c.prepend(svg);
+    const total=invest.reduce((a,s)=>a+s.v,0); let x=0; const tip=tipFor(c); const bh=28;
+    invest.forEach((s,k)=>{ const w=(s.v/total)*W; const g=el('g',{tabindex:0,'class':'seg'},svg); const ww=k===invest.length-1?w:w-2;
+      el('rect',{x,y:4,width:Math.max(2,ww),height:bh,rx:k===0||k===invest.length-1?4:0,fill:css(s.key)},g);
+      const pct=Math.round(s.v/total*100); const label=lakh(s.v)+' · '+pct+'%';
+      if(ww>90) txt(g,x+8,4+bh+18,label,{'class':'lbl-strong'}); else if(W>=520) txt(g,x+2,4+bh+18,lakh(s.v),{'class':'lbl'});
+      const show=e=>{ const r=c.getBoundingClientRect(); g.style.opacity=.8; tip.show(s.name,[{value:inr(s.v),label:pct+'% of total',color:css(s.key)}],e&&e.clientX?e.clientX-r.left:x,e&&e.clientY?e.clientY-r.top:4); };
+      g.addEventListener('pointermove',show); g.addEventListener('focus',()=>show()); g.addEventListener('pointerleave',()=>{g.style.opacity=1;tip.hide();}); g.addEventListener('blur',()=>{g.style.opacity=1;tip.hide();});
+      x+=w; });
+  }
+
+  function renderAll(){
+    hbarRange('c-margin');
+    hbarSimple('c-share',share,v=>v+'%',{aria:'Carrier market shares',max:45,unit:'of shipments'});
+    vbars('c-season');
+    lines('c-profit',[{name:'Optimistic',key:'--s3',v:pOpt},{name:'Base',key:'--s1',v:pBase,mark:8,markLabel:'First profit: month 9',markBelow:false},{name:'Pessimistic',key:'--s2',v:pPes}],cal,1,v=>v===0?'0':(v/1000)+'k','Monthly net profit by scenario');
+    lines('c-cash',[{name:'Optimistic',key:'--s3',v:cOpt,mark:17,markLabel:'Paid back: month 17',markBelow:false},{name:'Base',key:'--s1',v:cBase,mark:21,markLabel:'Lowest: −₹11.45 L',markBelow:true},{name:'Pessimistic',key:'--s2',v:cPes}],['Jan-27'].concat(cal),0,v=>v===0?'0':lakh(v).replace('₹',''),'Cumulative cash by scenario');
+    stacked('c-mix',mix,(v,full)=>full?inr(v):(v===0?'0':(v/1e5)+'L'),'Revenue mix by stream');
+    stacked('c-heads',heads,v=>String(v),'Headcount by phase','people');
+    splitBar('c-invest');
+    hbarSimple('c-sens',sens,v=>v==null?'No':'~'+v,{aria:'Payback months under different changes',max:62,ref:48,axis:true,unit:'months to pay back',colorFn:(d,i)=>i===0?css('--ink-2'):(d[1]!=null&&d[1]<48?css('--s3'):css('--s2'))});
+  }
+  // legends and tables (static)
+  legend('l-profit',[{name:'Optimistic',color:'var(--s3)'},{name:'Base',color:'var(--s1)'},{name:'Pessimistic',color:'var(--s2)'}],'line');
+  legend('l-cash',[{name:'Optimistic',color:'var(--s3)'},{name:'Base',color:'var(--s1)'},{name:'Pessimistic (no stop checks)',color:'var(--s2)'}],'line');
+  legend('l-mix',mix.series.map(s=>({name:s.name,color:'var('+s.key+')'})));
+  legend('l-heads',heads.series.map(s=>({name:s.name,color:'var('+s.key+')'})));
+  legend('l-invest',invest.map(s=>({name:s.name,color:'var('+s.key+')'})));
+  table('t-margin',['Stream','Low ₹','Base ₹','High ₹'],margin.map(m=>[m[0],m[1],m[2],m[3]]));
+  table('t-share',['Carrier / group','Share %'],share.map(s=>[s[0],s[1]]));
+  table('t-season',['Month','Index'],season);
+  table('t-profit',['Month','Pessimistic','Base','Optimistic'],cal.map((c,i)=>[(i+1)+' · '+c,inr(pPes[i]),inr(pBase[i]),inr(pOpt[i])]));
+  table('t-cash',['Month','Pessimistic','Base','Optimistic'],['Jan-27'].concat(cal).map((c,i)=>[i+' · '+c,inr(cPes[i]),inr(cBase[i]),inr(cOpt[i])]));
+  table('t-sens',['Change from base','Payback (months)'],sens.map(s=>[s[0],s[2]]));
+  renderAll();
+  let rt; window.addEventListener('resize',()=>{ clearTimeout(rt); rt=setTimeout(renderAll,150); });
+  if(window.matchMedia){ const mq=matchMedia('(prefers-color-scheme: dark)'); mq.addEventListener&&mq.addEventListener('change',()=>{ renderAll(); }); }
+  new MutationObserver(()=>renderAll()).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+})();
+</script>
