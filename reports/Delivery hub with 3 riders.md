@@ -63,7 +63,7 @@ The base case needs **about ₹22 per delivered parcel just to break even** (₹
 
 ## Break-even needs 115-175 parcels a day, which is 40-60 per rider
 
-Break-even depends on just two numbers: the hub payout and the rider rate. The tables below use ₹18,000 a month of fixed costs (rent plus overheads, no optimizer) and ₹1 per parcel of debits. All figures are my arithmetic. At the end of break-even the owner still earns nothing for his time.
+Break-even depends on just two numbers: the hub payout and the rider rate. The tables below use ₹18,000 a month of fixed costs (rent plus overheads, no optimizer) and ₹1 per parcel of debits. All figures are my arithmetic. At the end of break-even the owner still earns nothing for their time.
 
 | Payout per parcel | Riders at ₹15/parcel | Riders at ₹13/parcel | Riders on salary (₹21,000 each incl. fuel and ESI) |
 |---|---|---|---|
